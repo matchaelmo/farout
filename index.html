@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAROUT — NYC App</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.11.0/mapbox-gl.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- MAP -->
+<div class="map-bg">
+  <div id="map"></div>
+  <div class="map-loading" id="mapLoading">Add your free Mapbox token in <strong>config.js</strong> to turn on the live NYC map.</div>
+</div>
+
+<!-- NAV -->
+<div class="top-nav">
+  <div class="logo"><span>FAR</span><span>OUT</span></div>
+  <div class="city-tag">🗽 New York City ↓</div>
+  <div class="car-toggle">
+    <span id="carLabel">Car-Free ON</span>
+    <div class="toggle-pill" id="carToggle" onclick="toggleCar()"></div>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-title">Plan Your Adventure</div>
+    <div class="panel-sub">NYC · Car-free first · AI-powered</div>
+  </div>
+  <div class="panel-tabs">
+    <button class="tab active" onclick="switchTab('explore',this)">Explore</button>
+    <button class="tab" onclick="switchTab('route',this)">My Route</button>
+    <button class="tab" onclick="switchTab('trail',this)">🍃 Trail AI</button>
+  </div>
+
+  <!-- EXPLORE -->
+  <div class="panel-body" id="tab-explore">
+    <div class="section-label">What's your vibe?</div>
+    <div class="vibe-grid">
+      <button class="vibe-btn" onclick="pickVibe(this)">🚲 Go Ride</button>
+      <button class="vibe-btn" onclick="pickVibe(this)">🥾 Adventure</button>
+      <button class="vibe-btn" onclick="pickVibe(this)">👥 Friends Ride</button>
+      <button class="vibe-btn" onclick="pickVibe(this)">🌿 Nature</button>
+      <button class="vibe-btn" onclick="pickVibe(this)">🌅 Day Trip</button>
+      <button class="vibe-btn" onclick="pickVibe(this)">✨ Discover</button>
+    </div>
+    <div class="section-label">Energy level</div>
+    <div class="energy-row">
+      <button class="energy-btn" onclick="pickEnergy(this)">😌 Light</button>
+      <button class="energy-btn" onclick="pickEnergy(this)">🔥 Medium</button>
+      <button class="energy-btn" onclick="pickEnergy(this)">💪 Heavy</button>
+      <button class="energy-btn" onclick="pickEnergy(this)">🏕️ All Day</button>
+    </div>
+    <button class="go-btn" onclick="showResults()">Find My Adventure →</button>
+    <div id="results-wrap" style="display:none;">
+      <div class="section-label">Suggested for you</div>
+      <div class="result-card" onclick="selectResult(this,'8.2 mi','1h 20m','↑ 120ft','Bike')">
+        <div class="result-top"><div class="result-name">Hudson Greenway</div><span class="result-diff easy">Easy</span></div>
+        <div class="result-meta"><span>🚲 8.2 mi</span><span>⏱ 1h 20m</span><span>↑ 120ft</span></div>
+        <div class="result-tags"><span class="rtag bike">Protected Lane</span><span class="rtag transit">A/C/E → 34th</span></div>
+      </div>
+      <div class="result-card" onclick="selectResult(this,'3.1 mi loop','1h 10m','↑ 280ft','Trail')">
+        <div class="result-top"><div class="result-name">Inwood Hill Park</div><span class="result-diff easy">Easy</span></div>
+        <div class="result-meta"><span>🥾 3.1 mi</span><span>⏱ 1h 10m</span><span>↑ 280ft</span></div>
+        <div class="result-tags"><span class="rtag transit">1 Train → Dyckman</span><span class="rtag bike">+ 0.3mi walk</span></div>
+      </div>
+      <div class="result-card" onclick="selectResult(this,'3.8 mi loop','1h 30m','↑ 600ft','Trail + Train')">
+        <div class="result-top"><div class="result-name">Cold Spring Loop</div><span class="result-diff moderate">Moderate</span></div>
+        <div class="result-meta"><span>🥾 3.8 mi</span><span>⏱ 1h 30m</span><span>↑ 600ft</span></div>
+        <div class="result-tags"><span class="rtag transit">Metro-North → Cold Spring</span><span class="rtag car">🚗 also driveable</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUTE -->
+  <div class="panel-body" id="tab-route" style="display:none;">
+    <div class="section-label">Starting point</div>
+    <div class="route-input-wrap">
+      <div class="route-dot s"></div>
+      <input class="route-input" placeholder="Your location or address" id="startInput"/>
+    </div>
+    <div class="section-label" style="margin-top:0.85rem;">Destination</div>
+    <div class="route-input-wrap">
+      <div class="route-dot e"></div>
+      <input class="route-input" placeholder="Where do you want to go?" id="endInput"/>
+    </div>
+    <div style="margin-top:1rem;">
+      <div class="section-label">Travel mode</div>
+      <div class="energy-row" id="travelModes">
+        <button class="energy-btn active" data-mode="cycling" onclick="pickEnergy(this)">🚲 Bike</button>
+        <button class="energy-btn" data-mode="walking" onclick="pickEnergy(this)">🚶 Walk</button>
+        <button class="energy-btn" data-mode="driving" onclick="pickEnergy(this)">🚗 Car</button>
+      </div>
+    </div>
+    <button class="go-btn" style="margin-top:0.85rem;" onclick="showRoute()">Plan My Route →</button>
+    <div class="route-status" id="routeStatus">Tip: try “Times Square” to “Brooklyn Bridge Park”.</div>
+    <div id="route-result" style="display:none;"></div>
+  </div>
+
+  <!-- TRAIL AI -->
+  <div class="panel-body" id="tab-trail" style="display:none;padding-bottom:0;">
+    <div class="chat-wrap" id="chatWrap">
+      <div>
+        <div class="chat-name">🍃 Trail</div>
+        <div class="chat-bubble ai">Hey! I'm Trail — your Farout adventure guide. Tell me what you're feeling today and I'll plan something perfect. Energy level, time you have, vibe — anything helps!</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Tell Trail what you're feeling..." onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="chat-send" onclick="sendChat()">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="map-legend">
+  <div class="legend-title">Bike Lanes</div>
+  <div class="legend-item"><div class="legend-line" style="background:#2D9E5A;"></div>Protected</div>
+  <div class="legend-item"><div class="legend-line" style="background:#378ADD;"></div>Painted</div>
+  <div class="legend-item"><div class="legend-line" style="background:#7F77DD;"></div>Shared</div>
+</div>
+
+<!-- ROUTE BAR -->
+<div class="route-info" id="routeInfo">
+  <div class="rinfo-item"><div class="rinfo-val" id="ri-dist">—</div><div class="rinfo-label">Distance</div></div>
+  <div class="rinfo-item"><div class="rinfo-val" id="ri-time">—</div><div class="rinfo-label">Est. Time</div></div>
+  <div class="rinfo-item"><div class="rinfo-val" id="ri-elev">—</div><div class="rinfo-label">Bike Lane</div></div>
+  <div class="rinfo-item"><div class="rinfo-val" style="color:var(--trail);" id="ri-mode">—</div><div class="rinfo-label">Mode</div></div>
+</div>
+
+<script src="config.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.11.0/mapbox-gl.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

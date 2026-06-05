@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAROUT — Trails</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--forest:#2D6A4F;--trail:#52B788;--volcano:#D94F00;--ink:#1A1A1A;--sand:#F5F0E8;--steel:#C8CDD4;--metro-blue:#378ADD;--dawn:#FFB347;--concrete:#8B8F96;--card:#F0EBE3;}
+body{font-family:'Nunito',sans-serif;background:var(--sand);color:var(--ink);}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;background:rgba(245,240,232,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(45,106,79,0.12);}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:2rem;letter-spacing:0.04em;text-decoration:none;}
+.logo span:first-child{color:var(--forest);}
+.logo span:last-child{color:var(--volcano);}
+.nav-links{display:flex;gap:2rem;list-style:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1rem;letter-spacing:0.08em;text-transform:uppercase;}
+.nav-links a{color:var(--ink);text-decoration:none;opacity:0.7;transition:opacity 0.2s;}
+.nav-links a:hover,.nav-links a.active{opacity:1;color:var(--forest);}
+.nav-cta{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.95rem;letter-spacing:0.1em;text-transform:uppercase;background:var(--volcano);color:white;border:none;padding:0.55rem 1.4rem;border-radius:2px;cursor:pointer;text-decoration:none;transition:all 0.15s;}
+.nav-cta:hover{background:#BF4400;}
+
+.page-hero{padding:8rem 2.5rem 3rem;background:var(--forest);position:relative;overflow:hidden;}
+.page-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(82,183,136,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(82,183,136,0.07) 1px,transparent 1px);background-size:48px 48px;}
+.page-hero-content{position:relative;z-index:1;}
+.page-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.8rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--trail);margin-bottom:0.75rem;}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(3rem,7vw,5.5rem);line-height:0.9;color:var(--sand);margin-bottom:1rem;}
+.page-title span{color:var(--volcano);}
+.page-desc{font-size:1rem;color:rgba(245,240,232,0.6);max-width:500px;line-height:1.7;}
+
+.filters-bar{background:white;border-bottom:1px solid rgba(26,26,26,0.08);padding:1.25rem 2.5rem;position:sticky;top:64px;z-index:50;display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;}
+.filter-group{display:flex;gap:0.4rem;align-items:center;}
+.filter-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--concrete);margin-right:0.25rem;}
+.filter-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.4rem 0.9rem;border-radius:2px;border:1px solid rgba(26,26,26,0.12);background:transparent;color:var(--concrete);cursor:pointer;transition:all 0.2s;}
+.filter-btn:hover,.filter-btn.active{background:var(--forest);color:white;border-color:var(--forest);}
+.filter-btn.active-blue{background:var(--metro-blue);color:white;border-color:var(--metro-blue);}
+.filter-btn.active-orange{background:var(--volcano);color:white;border-color:var(--volcano);}
+.filter-divider{width:1px;height:24px;background:rgba(26,26,26,0.1);}
+
+.trails-main{padding:3rem 2.5rem;max-width:1200px;margin:0 auto;}
+.trails-count{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.8rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--concrete);margin-bottom:2rem;}
+
+.trails-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;}
+
+.trail-card{background:white;border:1px solid rgba(26,26,26,0.08);border-radius:4px;overflow:hidden;transition:all 0.2s;cursor:pointer;}
+.trail-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.1);border-color:var(--trail);}
+
+.trail-card-img{height:160px;position:relative;display:flex;align-items:flex-end;padding:1rem;}
+.trail-card-img.green{background:linear-gradient(135deg,#1a3a2a 0%,#2D6A4F 60%,#52B788 100%);}
+.trail-card-img.blue{background:linear-gradient(135deg,#0d2137 0%,#1a4a7a 60%,#378ADD 100%);}
+.trail-card-img.orange{background:linear-gradient(135deg,#2a1a0d 0%,#6b3a1a 60%,#D94F00 100%);}
+.trail-card-img.purple{background:linear-gradient(135deg,#1a1a3a 0%,#3a2a6b 60%,#7F77DD 100%);}
+.trail-card-img.teal{background:linear-gradient(135deg,#0d2a2a 0%,#1a5a5a 60%,#2D9E5A 100%);}
+.trail-card-img.dawn{background:linear-gradient(135deg,#2a1a0d 0%,#7a4a1a 60%,#FFB347 100%);}
+
+.trail-mode-badge{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:1px;position:absolute;top:1rem;left:1rem;}
+.badge-hike{background:rgba(45,106,79,0.9);color:white;}
+.badge-bike{background:rgba(55,138,221,0.9);color:white;}
+.badge-walk{background:rgba(255,179,71,0.9);color:var(--ink);}
+.badge-multi{background:rgba(127,119,221,0.9);color:white;}
+
+.diff-pill{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:1px;position:absolute;top:1rem;right:1rem;}
+.easy{background:rgba(82,183,136,0.9);color:white;}
+.moderate{background:rgba(255,179,71,0.9);color:var(--ink);}
+.hard{background:rgba(217,79,0,0.9);color:white;}
+
+.trail-emoji{font-size:2.5rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));}
+
+.trail-card-body{padding:1.25rem 1.5rem 1.5rem;}
+.trail-area{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--trail);margin-bottom:0.3rem;}
+.trail-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.3rem;text-transform:uppercase;letter-spacing:0.03em;color:var(--ink);margin-bottom:0.5rem;}
+.trail-desc{font-size:0.82rem;color:var(--concrete);line-height:1.6;margin-bottom:1rem;}
+
+.trail-times{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+.time-chip{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.55rem;border-radius:1px;border:1px solid rgba(26,26,26,0.1);color:var(--concrete);}
+.time-chip.hike{border-color:rgba(45,106,79,0.3);color:var(--forest);}
+.time-chip.bike{border-color:rgba(55,138,221,0.3);color:var(--metro-blue);}
+.time-chip.walk{border-color:rgba(255,179,71,0.4);color:#8B6914;}
+
+.trail-meta-row{display:flex;gap:1rem;font-size:0.75rem;color:var(--concrete);margin-bottom:1rem;flex-wrap:wrap;}
+.trail-transit-row{display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;padding-top:0.85rem;border-top:1px solid rgba(26,26,26,0.06);}
+.transit-tag{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;padding:0.15rem 0.45rem;border-radius:1px;}
+.t-subway{background:rgba(55,138,221,0.12);color:var(--metro-blue);}
+.t-train{background:rgba(45,106,79,0.12);color:var(--forest);}
+.t-bus{background:rgba(255,179,71,0.15);color:#8B6914;}
+.t-car{background:rgba(139,143,150,0.12);color:var(--concrete);}
+.t-walk{background:rgba(127,119,221,0.12);color:#5A54B0;}
+
+.trail-cta{width:100%;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;background:var(--forest);color:white;border:none;padding:0.7rem;border-radius:2px;cursor:pointer;transition:background 0.2s;text-decoration:none;display:block;text-align:center;margin-top:1rem;}
+.trail-cta:hover{background:#3a8a65;}
+
+.no-results{text-align:center;padding:4rem 2rem;color:var(--concrete);}
+.no-results-icon{font-size:3rem;margin-bottom:1rem;}
+.no-results-text{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.2rem;text-transform:uppercase;letter-spacing:0.08em;}
+
+footer{background:var(--ink);padding:2.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-top:4rem;}
+.footer-logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.5rem;text-decoration:none;}
+.footer-logo span:first-child{color:var(--trail);}
+.footer-logo span:last-child{color:var(--volcano);}
+.footer-text{font-size:0.8rem;color:rgba(245,240,232,0.35);font-family:'Nunito',sans-serif;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><span>FAR</span><span>OUT</span></a>
+  <ul class="nav-links">
+    <li><a href="about.html">About</a></li>
+    <li><a href="trails.html" class="active">Trails</a></li>
+    <li><a href="app.html">Bike</a></li>
+    <li><a href="discover.html">Discover</a></li>
+  </ul>
+  <a href="app.html" class="nav-cta">Get Outside →</a>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-content">
+    <p class="page-label">NYC / NJ Area</p>
+    <h1 class="page-title">Find Your<br><span>Trail</span></h1>
+    <p class="page-desc">Every trail reachable without a car — or with one when you need it. Filter by how you move and how much time you have.</p>
+  </div>
+</div>
+
+<div class="filters-bar">
+  <div class="filter-group">
+    <span class="filter-label">Mode</span>
+    <button class="filter-btn active" onclick="filterMode(this,'all')">All</button>
+    <button class="filter-btn" onclick="filterMode(this,'hike')">🥾 Hike</button>
+    <button class="filter-btn" onclick="filterMode(this,'bike')">🚲 Bike</button>
+    <button class="filter-btn" onclick="filterMode(this,'walk')">🚶 Walk</button>
+  </div>
+  <div class="filter-divider"></div>
+  <div class="filter-group">
+    <span class="filter-label">Time</span>
+    <button class="filter-btn" onclick="filterTime(this,'under1')">Under 1hr</button>
+    <button class="filter-btn" onclick="filterTime(this,'1to2')">1–2 hrs</button>
+    <button class="filter-btn" onclick="filterTime(this,'halfday')">Half Day</button>
+    <button class="filter-btn" onclick="filterTime(this,'fullday')">Full Day</button>
+  </div>
+  <div class="filter-divider"></div>
+  <div class="filter-group">
+    <span class="filter-label">Difficulty</span>
+    <button class="filter-btn" onclick="filterDiff(this,'easy')">Easy</button>
+    <button class="filter-btn" onclick="filterDiff(this,'moderate')">Moderate</button>
+    <button class="filter-btn" onclick="filterDiff(this,'hard')">Hard</button>
+  </div>
+</div>
+
+<div class="trails-main">
+  <div class="trails-count" id="trailsCount">Showing 12 trails · NYC / NJ Area</div>
+  <div class="trails-grid" id="trailsGrid">
+
+    <div class="trail-card" data-mode="hike" data-time="1to2" data-diff="easy">
+      <div class="trail-card-img green">
+        <span class="trail-mode-badge badge-hike">🥾 Hike</span>
+        <span class="diff-pill easy">Easy</span>
+        <span class="trail-emoji">🌲</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Upper Manhattan · NYC</div>
+        <div class="trail-name">Inwood Hill Park</div>
+        <div class="trail-desc">Ancient forest with Manhattan schist caves, herons, and zero tourists. The city's last natural forest.</div>
+        <div class="trail-times">
+          <span class="time-chip hike">🥾 1h 10m hike</span>
+          <span class="time-chip walk">🚶 1h 30m walk</span>
+        </div>
+        <div class="trail-meta-row"><span>3.1 mi loop</span><span>↑ 280 ft</span><span>Low crowds</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-subway">1 Train → Dyckman St</span>
+          <span class="transit-tag t-walk">+ 5 min walk</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="hike" data-time="under1" data-diff="easy">
+      <div class="trail-card-img teal">
+        <span class="trail-mode-badge badge-hike">🥾 Hike</span>
+        <span class="diff-pill easy">Easy</span>
+        <span class="trail-emoji">🦅</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Staten Island · NYC</div>
+        <div class="trail-name">Greenbelt Forest Trail</div>
+        <div class="trail-desc">2,800 acres of forest in the middle of NYC. Feels like upstate, costs a ferry ride.</div>
+        <div class="trail-times">
+          <span class="time-chip hike">🥾 45m hike</span>
+          <span class="time-chip bike">🚲 20m bike</span>
+        </div>
+        <div class="trail-meta-row"><span>2.4 mi</span><span>↑ 180 ft</span><span>Very quiet</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-subway">Staten Island Ferry</span>
+          <span class="transit-tag t-bus">S62 Bus → Greenbelt</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="hike" data-time="1to2" data-diff="moderate">
+      <div class="trail-card-img blue">
+        <span class="trail-mode-badge badge-hike">🥾 Hike</span>
+        <span class="diff-pill moderate">Moderate</span>
+        <span class="trail-emoji">🏔️</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Hudson Valley · Metro-North</div>
+        <div class="trail-name">Cold Spring Loop</div>
+        <div class="trail-desc">River valley views, a charming small town, and trails that start steps from the train station.</div>
+        <div class="trail-times">
+          <span class="time-chip hike">🥾 1h 30m hike</span>
+        </div>
+        <div class="trail-meta-row"><span>3.8 mi loop</span><span>↑ 600 ft</span><span>Moderate crowds</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-train">Metro-North → Cold Spring</span>
+          <span class="transit-tag t-walk">+ 2 min walk</span>
+          <span class="transit-tag t-car">🚗 also driveable</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="bike" data-time="1to2" data-diff="easy">
+      <div class="trail-card-img blue">
+        <span class="trail-mode-badge badge-bike">🚲 Bike</span>
+        <span class="diff-pill easy">Easy</span>
+        <span class="trail-emoji">🌊</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Manhattan · NYC</div>
+        <div class="trail-name">Hudson River Greenway</div>
+        <div class="trail-desc">11 miles of protected path from Battery Park to Inwood. The best bike commute in America.</div>
+        <div class="trail-times">
+          <span class="time-chip bike">🚲 1h 20m bike</span>
+          <span class="time-chip walk">🚶 3h walk</span>
+        </div>
+        <div class="trail-meta-row"><span>11 mi one-way</span><span>Flat</span><span>Protected lane</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-subway">Any train → Chambers St</span>
+          <span class="transit-tag t-walk">+ 3 min walk</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="bike" data-time="under1" data-diff="easy">
+      <div class="trail-card-img green">
+        <span class="trail-mode-badge badge-bike">🚲 Bike</span>
+        <span class="diff-pill easy">Easy</span>
+        <span class="trail-emoji">🌳</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Brooklyn · NYC</div>
+        <div class="trail-name">Prospect Park Loop</div>
+        <div class="trail-desc">3.5 miles of car-free roads on weekends. Brooklyn's living room — flat, scenic, always buzzing.</div>
+        <div class="trail-times">
+          <span class="time-chip bike">🚲 25m bike</span>
+          <span class="time-chip walk">🚶 55m walk</span>
+        </div>
+        <div class="trail-meta-row"><span>3.5 mi loop</span><span>Flat</span><span>Car-free weekends</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-subway">2/3 → Grand Army Plaza</span>
+          <span class="transit-tag t-walk">+ 2 min walk</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="hike" data-time="halfday" data-diff="hard">
+      <div class="trail-card-img orange">
+        <span class="trail-mode-badge badge-hike">🥾 Hike</span>
+        <span class="diff-pill hard">Hard</span>
+        <span class="trail-emoji">🦌</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Ramapo · NJ Transit</div>
+        <div class="trail-name">Ramapo Reservation</div>
+        <div class="trail-desc">Wild NJ forest with lakes, rock scrambles, and views that feel nothing like the city you left.</div>
+        <div class="trail-times">
+          <span class="time-chip hike">🥾 4h hike</span>
+        </div>
+        <div class="trail-meta-row"><span>8.1 mi</span><span>↑ 1,600 ft</span><span>Quiet trails</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-train">NJ Transit → Mahwah</span>
+          <span class="transit-tag t-bike">+ 2mi bike</span>
+          <span class="transit-tag t-car">🚗 also driveable</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="walk" data-time="under1" data-diff="easy">
+      <div class="trail-card-img teal">
+        <span class="trail-mode-badge badge-walk">🚶 Walk</span>
+        <span class="diff-pill easy">Easy</span>
+        <span class="trail-emoji">🏝️</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Governors Island · NYC</div>
+        <div class="trail-name">Governors Island Loop</div>
+        <div class="trail-desc">Car-free island with hammocks, food trucks, and skyline views. Free ferry on weekdays.</div>
+        <div class="trail-times">
+          <span class="time-chip walk">🚶 45m walk</span>
+          <span class="time-chip bike">🚲 15m bike</span>
+        </div>
+        <div class="trail-meta-row"><span>2.2 mi loop</span><span>Flat</span><span>Zero cars</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-subway">1/R → Whitehall</span>
+          <span class="transit-tag t-walk">+ Ferry (free)</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="hike" data-time="halfday" data-diff="moderate">
+      <div class="trail-card-img purple">
+        <span class="trail-mode-badge badge-hike">🥾 Hike</span>
+        <span class="diff-pill moderate">Moderate</span>
+        <span class="trail-emoji">🌅</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Palisades · NJ</div>
+        <div class="trail-name">Palisades Long Path</div>
+        <div class="trail-desc">Walk the Hudson cliffs with Manhattan views across the river. One of the most dramatic hikes near NYC.</div>
+        <div class="trail-times">
+          <span class="time-chip hike">🥾 3h hike</span>
+        </div>
+        <div class="trail-meta-row"><span>6.4 mi</span><span>↑ 900 ft</span><span>Stunning views</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-bus">NJ Bus 9A → Alpine</span>
+          <span class="transit-tag t-car">🚗 also driveable</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="bike" data-time="halfday" data-diff="moderate">
+      <div class="trail-card-img dawn">
+        <span class="trail-mode-badge badge-bike">🚲 Bike</span>
+        <span class="diff-pill moderate">Moderate</span>
+        <span class="trail-emoji">🌉</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Brooklyn to Queens · NYC</div>
+        <div class="trail-name">Five Boro Bike Tour Route</div>
+        <div class="trail-desc">The classic NYC cycling route across all five boroughs. Mix of protected lanes and shared streets.</div>
+        <div class="trail-times">
+          <span class="time-chip bike">🚲 3h bike</span>
+        </div>
+        <div class="trail-meta-row"><span>20 mi</span><span>Rolling</span><span>Mixed lanes</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-subway">Any train → Start anywhere</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="hike" data-time="halfday" data-diff="moderate">
+      <div class="trail-card-img green">
+        <span class="trail-mode-badge badge-hike">🥾 Hike</span>
+        <span class="diff-pill moderate">Moderate</span>
+        <span class="trail-emoji">⛰️</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Hook Mountain · Metro-North</div>
+        <div class="trail-name">Hook Mountain Loop</div>
+        <div class="trail-desc">Hudson River summit views, rocky ridgelines, and a train ride that feels like an escape hatch.</div>
+        <div class="trail-times">
+          <span class="time-chip hike">🥾 2h 30m hike</span>
+        </div>
+        <div class="trail-meta-row"><span>5.2 mi loop</span><span>↑ 1,100 ft</span><span>Panoramic views</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-train">Metro-North → Nyack</span>
+          <span class="transit-tag t-bike">+ 3mi bike</span>
+          <span class="transit-tag t-car">🚗 also driveable</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="walk" data-time="1to2" data-diff="easy">
+      <div class="trail-card-img blue">
+        <span class="trail-mode-badge badge-walk">🚶 Walk</span>
+        <span class="diff-pill easy">Easy</span>
+        <span class="trail-emoji">🌸</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Queens · NYC</div>
+        <div class="trail-name">Jamaica Bay Wildlife Refuge</div>
+        <div class="trail-desc">Unexpected wilderness in Queens. Migratory birds, salt marshes, and a boardwalk that feels like another world.</div>
+        <div class="trail-times">
+          <span class="time-chip walk">🚶 1h 30m walk</span>
+          <span class="time-chip bike">🚲 45m bike</span>
+        </div>
+        <div class="trail-meta-row"><span>3.8 mi</span><span>Flat</span><span>Wildlife rich</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-subway">A Train → Broad Channel</span>
+          <span class="transit-tag t-walk">+ 10 min walk</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+    <div class="trail-card" data-mode="hike" data-time="fullday" data-diff="hard">
+      <div class="trail-card-img orange">
+        <span class="trail-mode-badge badge-hike">🥾 Hike</span>
+        <span class="diff-pill hard">Hard</span>
+        <span class="trail-emoji">🏕️</span>
+      </div>
+      <div class="trail-card-body">
+        <div class="trail-area">Catskills · Long Distance</div>
+        <div class="trail-name">Slide Mountain</div>
+        <div class="trail-desc">The highest peak in the Catskills. A full day out — best done with an early train and a car at the trailhead.</div>
+        <div class="trail-times">
+          <span class="time-chip hike">🥾 6h hike</span>
+        </div>
+        <div class="trail-meta-row"><span>6.8 mi</span><span>↑ 1,780 ft</span><span>Remote</span></div>
+        <div class="trail-transit-row">
+          <span class="transit-tag t-train">Trailways Bus → Woodstock</span>
+          <span class="transit-tag t-car">🚗 car recommended</span>
+        </div>
+        <a href="app.html" class="trail-cta">Plan This Trail →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <a href="index.html" class="footer-logo"><span>FAR</span><span>OUT</span></a>
+  <div class="footer-text">© 2026 Farout · Car-Free First · Built with 🍃</div>
+  <div class="footer-text" style="color:rgba(245,240,232,0.2);">Made in New York</div>
+</footer>
+
+<script>
+let activeMode='all', activeTime=null, activeDiff=null;
+
+function filterMode(btn, mode){
+  document.querySelectorAll('.filter-group:nth-child(1) .filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeMode=mode;
+  applyFilters();
+}
+
+function filterTime(btn, time){
+  const wasActive = btn.classList.contains('active');
+  document.querySelectorAll('.filter-group:nth-child(3) .filter-btn').forEach(b=>b.classList.remove('active'));
+  if(!wasActive){ btn.classList.add('active'); activeTime=time; }
+  else activeTime=null;
+  applyFilters();
+}
+
+function filterDiff(btn, diff){
+  const wasActive = btn.classList.contains('active');
+  document.querySelectorAll('.filter-group:nth-child(5) .filter-btn').forEach(b=>b.classList.remove('active'));
+  if(!wasActive){ btn.classList.add('active'); activeDiff=diff; }
+  else activeDiff=null;
+  applyFilters();
+}
+
+function applyFilters(){
+  const cards = document.querySelectorAll('.trail-card');
+  let visible=0;
+  cards.forEach(card=>{
+    const modeMatch = activeMode==='all' || card.dataset.mode===activeMode;
+    const timeMatch = !activeTime || card.dataset.time===activeTime;
+    const diffMatch = !activeDiff || card.dataset.diff===activeDiff;
+    const show = modeMatch && timeMatch && diffMatch;
+    card.style.display = show ? 'block' : 'none';
+    if(show) visible++;
+  });
+  document.getElementById('trailsCount').textContent = `Showing ${visible} trail${visible!==1?'s':''} · NYC / NJ Area`;
+}
+</script>
+</body>
+</html>
